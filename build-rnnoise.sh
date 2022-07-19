@@ -47,6 +47,7 @@ function build_rnnoise() {
   emmake make
 
   emcc \
+    -s WASM_ASYNC_COMPILATION=0 -s SINGLE_FILE=1 \
     -s STRICT=1 \
     -s ALLOW_MEMORY_GROWTH=1 \
     -s MALLOC=emmalloc \
@@ -65,11 +66,11 @@ build_rnnoise "${OPTIMIZE}" "" "rnnoise"
 # SIMD版をビルド
 build_rnnoise "${OPTIMIZE} -msimd128" "--enable-wasm-simd" "rnnoise_simd"
 
-# ビルド結果をコピー (JavaScriptファイルはSIMD対応・非対応のどちらでも同じなので使い回す）
+# ビルド結果をコピー
 mkdir -p dist
-mv $BUILD_DIR/rnnoise/rnnoise/rnnoise.wasm dist/
+tree $BUILD_DIR/rnnoise/rnnoise
+mv $BUILD_DIR/rnnoise_simd/rnnoise/rnnoise_simd.js src/rnnoise_simd_wasm.js
 mv $BUILD_DIR/rnnoise/rnnoise/rnnoise.js src/rnnoise_wasm.js
-mv $BUILD_DIR/rnnoise_simd/rnnoise/rnnoise_simd.wasm dist/
 
 # 一時ディレクトリを削除
 rm -rf $BUILD_DIR
